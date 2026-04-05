@@ -1,4 +1,5 @@
 import enum
+from typing import Optional
 
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import String, Boolean, ForeignKey, Enum
@@ -14,13 +15,9 @@ class SkillLevel(enum.Enum):
 class UserSkill(Base):
     __tablename__ = "user_skills"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.id", ondelete="CASCADE"), nullable=False)
-    level: Mapped[SkillLevel] = mapped_column(
-        Enum(SkillLevel, name="skill_level")
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.id", ondelete="CASCADE"), primary_key=True)
+    level: Mapped[Optional[SkillLevel]] = mapped_column(
+        Enum(SkillLevel, name="skill_level_enum"),
+        nullable=True
     )
-
-    user: Mapped["User"] = relationship("User", back_populates="skills")
-    skill: Mapped["Skill"] = relationship("Skill", back_populates="users")

@@ -1,5 +1,11 @@
+from typing import Optional
+
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import (
+    String, 
+    ForeignKey,
+    Text
+)
 
 from app.db.base import Base
 
@@ -7,14 +13,11 @@ from app.db.base import Base
 class Profile(Base):
     __tablename__ = "profiles"
 
-    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
-        unique=True, nullable=False
-    )
-    phone: Mapped[str] = mapped_column(String(50), nullable=True)
-    bio: Mapped[str] = mapped_column(String(500), nullable=True)
-    position_title: Mapped[str] = mapped_column(String(255), nullable=True)
-    avatar_url: Mapped[str] = mapped_column(String(500), nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    phone: Mapped[Optional[str]] = mapped_column(String(30))
+    bio: Mapped[Optional[str]] = mapped_column(Text)
+    position_title: Mapped[Optional[str]] = mapped_column(String(150))
+    avatar_url: Mapped[Optional[str]] = mapped_column(String(500))
 
-    user: Mapped["User"] = relationship("User", back_populates="profile")
+    user: Mapped["User"] = relationship(back_populates="profile")

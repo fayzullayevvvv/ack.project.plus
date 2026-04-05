@@ -3,9 +3,12 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.dependencies import get_db
+from app.db.init_db import init_db
 
 
 app = FastAPI()
+
+init_db()
 
 
 
