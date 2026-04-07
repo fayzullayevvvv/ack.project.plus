@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     PGSSLMODE: str
     PGCHANNELBINDING: str
 
-    class Config():
+    class Config:
         env_file = ".env"
 
 
