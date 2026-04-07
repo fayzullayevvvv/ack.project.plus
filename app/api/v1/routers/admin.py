@@ -12,7 +12,9 @@ from app.models import User
 router = APIRouter(tags=["Admin"])
 
 
-@router.post("/v1/admin/users", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/v1/admin/users", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_user_view(
     data: Annotated[CreateUser, Body()],
     admin: Annotated[User, Depends(get_admin)],

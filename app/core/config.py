@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     PGPASSWORD: str
     PGSSLMODE: str
     PGCHANNELBINDING: str
-    
+
     SECRET_KEY: str
     ALGORITHM: str
     EXPIRE_MINUTES: int
