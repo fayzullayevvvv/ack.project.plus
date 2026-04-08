@@ -1,0 +1,28 @@
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
+
+from app.models import User
+from app.repositories import UserRepository
+from app.core.security import hash_password
+
+
+class UserService:
+    def __init__(self, db: Session):
+        self.db = db
+        self.repo = UserRepository(db=self.db)
+
+    def create_user(
+        self, full_name: str, username: str, email: str, role: str, password: str
+    ) -> User:
+
+        existing = self.repo.get_by_email(email)
+        if existing:
+            raise HTTPException(400, "Email already exists")
+
+        existing = self.repo.get_by_username(username)
+        if existing:
+            raise HTTPException(400, "Username already exists")
+
+        password = hash_password(password)
+
+        return self.repo.create_user(full_name, username, email, role, password)

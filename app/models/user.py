@@ -1,15 +1,17 @@
 from typing import List, Optional
 from datetime import datetime
+import enum
 
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import (
-    String,
-    Boolean,
-    DateTime,
-    func
-)
+from sqlalchemy import String, Boolean, DateTime, Enum, func
 
 from app.db.base import Base, TimeStampMixin
+
+
+class RoleCode(str, enum.Enum):
+    admin = "admin"
+    manager = "manager"
+    worker = "worker"
 
 
 class User(Base):
@@ -17,16 +19,21 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    role: Mapped[RoleCode] = mapped_column(
+        Enum(RoleCode, name="role_enum"),
+        nullable=False,
+        index=True,
+    )
+    username: Mapped[str] = mapped_column(
+        String(100), unique=True, nullable=False, index=True
+    )
+    email: Mapped[str] = mapped_column(
+        String(255), unique=True, nullable=False, index=True
+    )
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-
-    roles: Mapped[List["Role"]] = relationship(
-        secondary="user_roles",
-        back_populates="users",
-        lazy="selectin",
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
     profile: Mapped[Optional["Profile"]] = relationship(
@@ -57,4 +64,6 @@ class User(Base):
     )
 
     daily_reports: Mapped[List["DailyReport"]] = relationship(back_populates="user")
-    task_submissions: Mapped[List["TaskSubmission"]] = relationship(back_populates="worker")
+    task_submissions: Mapped[List["TaskSubmission"]] = relationship(
+        back_populates="worker"
+    )

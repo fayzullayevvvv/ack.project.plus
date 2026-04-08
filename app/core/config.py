@@ -6,10 +6,8 @@ class Settings(BaseSettings):
     PGDATABASE: str
     PGUSER: str
     PGPASSWORD: str
-    PGSSLMODE: str
-    PGCHANNELBINDING: str
 
-    class Config():
+    class Config:
         env_file = ".env"
 
 
