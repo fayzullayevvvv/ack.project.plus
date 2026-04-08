@@ -23,3 +23,4 @@ class TaskTemplate(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     tasks: Mapped[List["Task"]] = relationship(back_populates="template")
+    manager: Mapped["User"] = relationship("User")

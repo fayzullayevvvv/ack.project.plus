@@ -3,7 +3,7 @@ from datetime import datetime
 import enum
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, String, Text, DateTime, Enum, func
+from sqlalchemy import Index, ForeignKey, String, Text, DateTime, Enum, func
 
 from app.db.base import Base, TimeStampMixin
 
@@ -14,10 +14,15 @@ class TaskStatus(str, enum.Enum):
     submitted = "submitted"
     done = "done"
     cancelled = "cancelled"
+    late = "late"
 
 
 class Task(Base, TimeStampMixin):
     __tablename__ = "tasks"
+
+    __table_args__ = (
+    Index("idx_task_assigned_to_status", "assigned_to_id", "status"),
+)
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     project_id: Mapped[int] = mapped_column(

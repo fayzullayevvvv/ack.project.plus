@@ -1,10 +1,18 @@
+import enum
+
 from datetime import date, datetime
 from typing import Optional, List
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, String, Text, Date, DateTime, func
+from sqlalchemy import ForeignKey, String, Text, Date, DateTime, Enum, func
 
 from app.db.base import Base
+
+
+class ProjectStatus(str, enum.Enum):
+    active = "active"
+    completed = "completed"
+    archived = "archived"
 
 
 class Project(Base):
@@ -16,7 +24,11 @@ class Project(Base):
     manager_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="RESTRICT"), nullable=False, index=True
     )
-    status: Mapped[str] = mapped_column(String(50), default="active", nullable=False)
+    status: Mapped[ProjectStatus] = mapped_column(
+        Enum(ProjectStatus, name="project_status"),
+        default=ProjectStatus.active,
+        nullable=False,
+    )
     start_date: Mapped[Optional[date]] = mapped_column(Date)
     end_date: Mapped[Optional[date]] = mapped_column(Date)
     created_at: Mapped[datetime] = mapped_column(
