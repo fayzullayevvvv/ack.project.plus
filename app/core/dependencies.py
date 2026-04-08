@@ -9,7 +9,7 @@ from app.models import User
 from app.db.session import SessionLocal
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/login")
 
 
 def get_db() -> Generator:

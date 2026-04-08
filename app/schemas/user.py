@@ -10,14 +10,15 @@ class UserRoleEnum(str, Enum):
 
 
 class CreateUser(BaseModel):
-    full_name: str = Field(min_length=5)
+    first_name: str = Field(min_length=5)
+    last_name: str = Field(min_length=5)
     username: str = Field(min_length=5)
     email: EmailStr
     role: UserRoleEnum
     password: str = Field(min_length=8)
     confirm_password: str = Field(min_length=8)
 
-    @field_validator("full_name", "username")
+    @field_validator("first_name", "username")
     @classmethod
     def validate_not_empty(cls, value: str):
         if not value.strip():
@@ -33,8 +34,11 @@ class CreateUser(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
-    full_name: str
+    first_name: str
+    last_name: str
     username: str
     email: EmailStr
     role: UserRoleEnum
-    password_hash: str
+
+    class Config:
+        from_attributes = True

@@ -8,7 +8,7 @@ from app.api.v1.routers.admin import router as admin_router
 from app.api.v1.routers.auth import router as auth_router
 
 
-init_db()
+# init_db()
 app = FastAPI()
 
 app.include_router(admin_router)

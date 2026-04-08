@@ -12,7 +12,7 @@ router = APIRouter(tags=["Auth"])
 
 
 @router.post("/v1/login", response_model=LoginResponse)
-async def login_view(
+def login_view(
     data: Annotated[LoginRequest, Body()], db: Annotated[Session, Depends(get_db)]
 ):
     user_repository = UserRepository(db)
@@ -24,7 +24,7 @@ async def login_view(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
 
-    if not verify_password(data.password, user.password):
+    if not verify_password(data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
