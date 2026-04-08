@@ -6,6 +6,8 @@ from app.core.dependencies import get_db
 from app.db.init_db import init_db
 from app.api.v1.routers.admin import router as admin_router
 from app.api.v1.routers.auth import router as auth_router
+from app.api.v1.routers.manager import router as manager_router
+from app.api.v1.routers.tasks import router as task_router
 
 
 # init_db()
@@ -13,3 +15,5 @@ app = FastAPI()
 
 app.include_router(admin_router)
 app.include_router(auth_router)
+app.include_router(manager_router)
+app.include_router(task_router)

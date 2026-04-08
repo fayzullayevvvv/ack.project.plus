@@ -11,10 +11,7 @@ from app.schemas.admin_user import AdminUpdateUser
 from app.repositories.user_repo import UserRepository
 
 
-router = APIRouter(
-    prefix="/v1/admin",
-    tags=["Admin"],
-)
+router = APIRouter(prefix="/v1/admin", tags=["Admin"])
 
 
 @router.post("/users", response_model=UserResponse, status_code=status.HTTP_201_CREATED)

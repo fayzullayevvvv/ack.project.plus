@@ -9,3 +9,4 @@ from app.models.user_profile import Profile
 from app.models.user_skills import UserSkill
 from app.models.user import User
 from app.models.user import RoleCode
+from app.models.task import TaskStatus
