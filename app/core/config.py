@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     PGUSER: str
     PGPASSWORD: str
 
+    SECRET_KEY: str
+    ALGORITHM: str
+    EXPIRE_MINUTES: int
+
     class Config:
         env_file = ".env"
 
