@@ -1,8 +1,7 @@
-from typing import List, Optional
-
 from sqlalchemy.orm import Session
 
 from app.models import User
+from app.schemas.admin_user import AdminUpdateUser
 
 
 class UserRepository:
@@ -32,6 +31,37 @@ class UserRepository:
         self.db.refresh(user)
 
         return user
+    
+    def update_user(self, user: User, data: AdminUpdateUser) -> User:
+
+        if data.first_name:
+            user.first_name = data.first_name
+
+        if data.last_name:
+            user.last_name = data.last_name
+
+        if data.username:
+            user.username = data.username
+
+        if data.email:
+            user.email = data.email
+
+        if data.role:
+            user.role = data.role
+
+        if data.password:
+            user.password_hash = data.password
+
+        self.db.commit()
+        self.db.refresh(user)
+
+        return user
+    
+    def delete_user(self, user: User) -> dict:
+        user.is_active = False
+        self.db.commit()
+        
+        return {"detail": "User deactivated"}
 
     def get_by_email(self, email: str) -> User:
         return self.db.query(User).filter(User.email == email).first()
@@ -51,3 +81,6 @@ class UserRepository:
             )
 
         return query.offset(skip).limit(limit).all()
+    
+    def get_user_by_id(self, id: int) -> User:
+        return self.db.query(User).filter(User.id == id).first()

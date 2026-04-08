@@ -29,7 +29,7 @@ def login_view(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
 
-    token_data = {"username": user.username}
+    token_data = {"sub": user.id, "username": user.username}
     access_token = generate_token(token_data)
 
     return LoginResponse(access_token=access_token)

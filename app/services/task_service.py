@@ -1,94 +1,63 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models import Task, User, Project, RoleCode, TaskSubmission, TaskStatus
-from app.schemas.task import TaskSubmitRequest
+from app.schemas.task import TaskSubmitRequest, CreateTask
+from app.repositories.project_repo import ProjectRepository
+from app.repositories.task_repo import TaskRepository
+from app.repositories.user_repo import UserRepository
 
 
 class TaskService:
     def __init__(self, db: Session):
         self.db = db
+        self.project_repo = ProjectRepository(db=self.db)
+        self.task_repo = TaskRepository(db=self.db)
+        self.user_repo = UserRepository(db=self.db)
 
-    def create_task(self, data, manager: User):
+    def create_task(self, data: CreateTask, manager: User) -> Task:
 
-        # 🔴 project tekshirish
-        project = self.db.get(Project, data.project_id)
+        project = self.project_repo.get_project_by_id(id=data.project_id)
         if not project:
             raise HTTPException(404, "Project not found")
 
-        # 🔴 ownership check
         if project.manager_id != manager.id:
             raise HTTPException(403, "Not your project")
 
-        # 🔴 worker tekshirish
-        worker = self.db.get(User, data.assigned_to_id)
+        worker = self.user_repo.get_user_by_id(id=data.assigned_to_id)
         if not worker:
             raise HTTPException(404, "Worker not found")
 
         if worker.role != RoleCode.worker:
             raise HTTPException(400, "User is not a worker")
 
-        # 🔴 deadline validation
         now = datetime.now(timezone.utc)
 
-        if data.deadline_at < now:
+        if data.deadline_at <= now + timedelta(seconds=1):
             raise HTTPException(400, "Deadline must be in the future")
 
-        task = Task(
-            project_id=data.project_id,
-            title=data.title,
-            description=data.description,
-            assigned_by_id=manager.id,
-            assigned_to_id=data.assigned_to_id,
-            deadline_at=data.deadline_at,
-        )
-
-        self.db.add(task)
-        self.db.commit()
-        self.db.refresh(task)
-
-        return task
-    
-    def get_worker_tasks(self, worker: User):
-        return (
-            self.db.query(Task)
-            .filter(Task.assigned_to_id == worker.id)
-            .all()
-        )
+        return self.task_repo.create_task(data=data, manager=manager)
     
     def submit_task(self, task_id: int, worker: User, data: TaskSubmitRequest):
 
-        task = self.db.get(Task, task_id)
+        task = self.task_repo.get_task_by_id(task_id)
 
         if not task:
             raise HTTPException(404, "Task not found")
 
-        # ❗ ownership
         if task.assigned_to_id != worker.id:
             raise HTTPException(403, "Not your task")
 
-        # ❗ already submitted
-        if task.submission:
+        if task.status in [TaskStatus.submitted, TaskStatus.late]:
             raise HTTPException(400, "Task already submitted")
 
-        # 🔥 STATUS LOGIC (ENG MUHIM QISM)
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
 
-        if task.deadline_at < now:
+        if now > task.deadline_at:
             task.status = TaskStatus.late
         else:
             task.status = TaskStatus.submitted
 
-        submission = TaskSubmission(
-            task_id=task.id,
-            worker_id=worker.id,
-            text_content=data.text_content,
-        )
-
-        self.db.add(submission)
-        self.db.commit()
-        self.db.refresh(submission)
-
-        return submission
+        return self.task_repo.task_submission(data=data, worker=worker, task=task)

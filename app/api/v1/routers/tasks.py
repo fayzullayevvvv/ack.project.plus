@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import get_db, get_manager, get_worker
 from app.schemas.task import CreateTask, TaskResponse, TaskSubmitRequest
 from app.services.task_service import TaskService
+from app.repositories.task_repo import TaskRepository
 from app.models import User, Task
 
 router = APIRouter(prefix="/v1", tags=["Tasks"])
@@ -26,8 +27,8 @@ def get_my_tasks(
     worker: Annotated[User, Depends(get_worker)],
     db: Annotated[Session, Depends(get_db)],
 ):
-    service = TaskService(db)
-    return service.get_worker_tasks(worker)
+    repository = TaskRepository(db)
+    return repository.get_worker_tasks(worker)
 
 
 @router.post("/worker/tasks/{task_id}/submit")

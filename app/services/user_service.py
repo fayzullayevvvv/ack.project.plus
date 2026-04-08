@@ -38,17 +38,9 @@ class UserService:
             first_name, last_name, username, email, role, password
         )
 
-    def get_user_by_id(self, user_id) -> User:
-        user = self.db.get(User, user_id)
-
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        return user
-
     def update_user(self, user_id: int, data: AdminUpdateUser):
 
-        user = self.db.get(User, user_id)
+        user = self.repo.get_user_by_id(user_id)
 
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -62,34 +54,15 @@ class UserService:
         if data.email and data.email != user.email:
             if self.repo.get_by_email(data.email):
                 raise HTTPException(400, "Email already exists")
-
-        # update fields
-        if data.first_name:
-            user.first_name = data.first_name
-
-        if data.last_name:
-            user.last_name = data.last_name
-
-        if data.username:
-            user.username = data.username
-
-        if data.email:
-            user.email = data.email
-
-        if data.role:
-            user.role = data.role
-
+            
         if data.password:
-            user.password_hash = hash_password(data.password)
+            data.password = hash_password(password=data.password)
 
-        self.db.commit()
-        self.db.refresh(user)
-
-        return user
+        return self.repo.update_user(user, data)
 
     def delete_user(self, user_id: int):
 
-        user = self.db.get(User, user_id)
+        user = self.repo.get_user_by_id(user_id)
 
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -97,8 +70,4 @@ class UserService:
         if not user.is_active:
             raise HTTPException(status_code=400, detail="User already deleted")
 
-        user.is_active = False
-
-        self.db.commit()
-
-        return {"detail": "User deactivated"}
+        return self.repo.delete_user(user)
