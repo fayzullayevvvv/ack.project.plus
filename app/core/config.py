@@ -2,6 +2,10 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    DEBUG: bool
+    HOST: str
+    PORT: int
+
     db_host: str
     db_port: int
     db_user: str

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.models import user
 from app.schemas.auth import UserLoginResponse, RefreshRequest, ChangePasswordRequest
+from app.schemas.user import UserResponseDetail
 from app.core.deps import get_db, get_user
 from app.services.user_service import UserService
 from app.models.user import User
@@ -65,12 +66,6 @@ def change_password_view(
     return {"message": "Password changed successfully"}
 
 
-@router.post("/me")
-def get_me(current_user: Annotated[User, Depends(get_user)]):
-    return {
-        "id": current_user.id,
-        "username": current_user.username,
-        "role": current_user.role,
-        "is_active": current_user.is_active,
-        "is_first_login": current_user.is_first_login,
-    }
+@router.post("/me", response_model=UserResponseDetail)
+async def get_me(current_user: Annotated[User, Depends(get_user)]):
+    return current_user

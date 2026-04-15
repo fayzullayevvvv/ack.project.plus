@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.repository.user_repo import UserRepo
 from app.schemas.auth import UserLoginResponse
+from app.schemas.user import CreateUser
 from app.core.security import (
     generate_token,
     generate_refresh_token,
@@ -20,6 +21,24 @@ class UserService:
     def __init__(self, db: Session):
         self.db = db
         self.repo = UserRepo(db)
+
+    def create_user(self, data: CreateUser) -> User:
+        user = self.repo.get_user_by_username(data.username)
+
+        if user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="username already exist"
+            )
+        user = self.repo.get_user_by_email(data.email)
+
+        if user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="email already exist"
+            )
+
+        data.password = hash_password(data.password)
+
+        return self.repo.create_user(data)
 
     def authenticate_user(self, credentials: HTTPBasicCredentials):
         user = self.repo.get_user_by_username(credentials.username)
