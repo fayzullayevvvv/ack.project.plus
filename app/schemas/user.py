@@ -96,3 +96,41 @@ class UserResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+from pydantic import BaseModel, Field, EmailStr, model_validator, ConfigDict
+from typing import Optional
+
+
+class UpdateUserData(BaseModel):
+    username: Optional[str] = Field(default=None, min_length=3, max_length=50)
+    email: Optional[EmailStr] = None
+    role: Optional[UserRole] = None
+
+    password: Optional[str] = Field(default=None, min_length=8, max_length=128)
+    confirm_password: Optional[str] = Field(default=None, min_length=8, max_length=128)
+
+    model_config = ConfigDict(extra="forbid")
+
+    @model_validator(mode="after")
+    def validate_passwords(self):
+        if self.password or self.confirm_password:
+            if self.password != self.confirm_password:
+                raise ValueError("passwords do not match")
+
+        return self
+
+    @field_validator("username")
+    @classmethod
+    def validate_username(cls, v: str) -> str:
+        v = v.strip()
+
+        if not v:
+            raise ValueError("Username cannot be empty")
+
+        if not USERNAME_REGEX.match(v):
+            raise ValueError(
+                "Username must contain only letters, numbers, and underscores"
+            )
+
+        return v
