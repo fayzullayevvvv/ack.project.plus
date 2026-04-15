@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.repository.user_repo import UserRepo
 from app.schemas.auth import UserLoginResponse
-from app.schemas.user import CreateUser
+from app.schemas.user import CreateUser, UpdateUserData
 from app.core.security import (
     generate_token,
     generate_refresh_token,
@@ -39,6 +39,40 @@ class UserService:
         data.password = hash_password(data.password)
 
         return self.repo.create_user(data)
+
+    def update_user(self, id: int, data: UpdateUserData, user: User) -> User:
+        if user.id != id and user.role == "worker":
+            raise HTTPException(
+                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                detail="Method not allowed",
+            )
+
+        if data.username:
+            if self.repo.get_user_by_username(data.username):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="username already exist",
+                )
+        if data.email:
+            if self.repo.get_user_by_email(data.email):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="email already exist",
+                )
+        if data.password:
+            data.password = hash_password(data.password)
+
+        return self.repo.update_user(id, data)
+
+    def activate_user(self, id: int):
+        user = self.get_user_by_id(id)
+
+        return self.repo.activate_user(user)
+
+    def deactivate_user(self, id: int):
+        user = self.get_user_by_id(id)
+
+        return self.repo.deactivate_user(user)
 
     def authenticate_user(self, credentials: HTTPBasicCredentials):
         user = self.repo.get_user_by_username(credentials.username)
@@ -96,7 +130,9 @@ class UserService:
 
         self.repo.revoke_refresh_token(db_token)
 
-    def change_password(self, user: User, old_password: str, new_password: str):
+    def change_password_current_user(
+        self, user: User, old_password: str, new_password: str
+    ):
         if not verify_password(old_password, user.password_hash):
             raise HTTPException(status_code=400, detail="Old password incorrect")
 
@@ -108,3 +144,11 @@ class UserService:
         new_hash = hash_password(new_password)
 
         self.repo.update_password(user, new_hash)
+
+    def get_user_by_id(self, id: int) -> User:
+        user = self.repo.get_user_by_id(id)
+
+        if not user:
+            raise HTTPException(status_code=404, detail="user not found")
+
+        return user

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.user import User
 from app.models.refresh_token import RefreshToken
-from app.schemas.user import CreateUser
+from app.schemas.user import CreateUser, UpdateUserData
 
 
 class UserRepo:
@@ -22,6 +22,45 @@ class UserRepo:
         self.db.refresh(user)
 
         return user
+
+    def update_user(self, id: int, data: UpdateUserData) -> User:
+        user = self.get_user_by_id(id)
+
+        if data.username:
+            user.username = data.username
+        if data.email:
+            user.email = data.email
+        if data.role:
+            user.role = data.role
+        if data.password:
+            user.password_hash = data.password
+
+        self.db.commit()
+
+        return user
+
+    def activate_user(self, user: User):
+        user.is_active = True
+
+        self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
+
+        return user
+
+    def deactivate_user(self, user: User):
+        print(user.is_active)
+        user.is_active = False
+        print(user.is_active)
+
+        self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
+
+        return user
+
+    def get_all_users(self) -> list[User] | None:
+        return self.db.query(User).all()
 
     def get_user_by_username(self, username: str):
         return self.db.query(User).filter(User.username == username).first()

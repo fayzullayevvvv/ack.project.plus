@@ -57,7 +57,7 @@ def change_password_view(
 ):
     service = UserService(db)
 
-    service.change_password(
+    service.change_password_current_user(
         user=current_user,
         old_password=data.old_password,
         new_password=data.new_password,

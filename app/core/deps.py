@@ -45,13 +45,19 @@ def get_user(
     return user
 
 
-def require_role(required_role: str):
+def require_role(required_role: str | list[str]):
     def role_checker(user: Annotated[User, Depends(get_user)]) -> User:
-        if user.role != required_role:
+
+        allowed_roles = (
+            required_role if isinstance(required_role, list) else [required_role]
+        )
+
+        if user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Requires {required_role} role",
+                detail=f"Requires one of roles: {allowed_roles}",
             )
+
         return user
 
     return role_checker
@@ -60,3 +66,5 @@ def require_role(required_role: str):
 get_admin = require_role("admin")
 get_manager = require_role("manager")
 get_worker = require_role("worker")
+
+get_admin_or_manager = require_role(["admin", "manager"])
