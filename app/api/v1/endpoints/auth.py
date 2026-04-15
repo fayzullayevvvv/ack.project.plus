@@ -16,7 +16,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/login", response_model=UserLoginResponse, status_code=status.HTTP_200_OK)
-async def login_view(
+def login_view(
     credentials: Annotated[HTTPBasicCredentials, Depends(HTTPBasic())],
     db: Annotated[Session, Depends(get_db)],
 ):
@@ -29,7 +29,7 @@ async def login_view(
 @router.post(
     "/refresh", response_model=UserLoginResponse, status_code=status.HTTP_200_OK
 )
-async def refresh_view(
+def refresh_view(
     data: Annotated[RefreshRequest, Body()], db: Annotated[Session, Depends(get_db)]
 ):
     user_service = UserService(db)
@@ -38,7 +38,7 @@ async def refresh_view(
 
 
 @router.post("/logout")
-async def logout(
+def logout(
     refresh_token: str,
     db: Annotated[Session, Depends(get_db)],
     user: Annotated[User, Depends(get_user)],
@@ -50,7 +50,7 @@ async def logout(
 
 
 @router.post("/change-password")
-async def change_password_view(
+def change_password_view(
     data: ChangePasswordRequest,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(get_user)],
