@@ -1,8 +1,10 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models.project import Project
 from app.models.user import User
 from app.models.project_members import ProjectMember
+from app.models.task import Task, TaskStatus
 
 
 class ProjectRepo:
@@ -69,3 +71,34 @@ class ProjectRepo:
         self.db.commit()
         self.db.refresh(project)
         return project
+    
+    def get_project_members(self, project_id: int):
+        return self.db.query(ProjectMember).filter(
+            ProjectMember.project_id == project_id
+        ).all()
+    
+    def delete_member(self, project_id: int, user_id: int):
+        member = self.db.query(ProjectMember).filter(
+            ProjectMember.project_id == project_id,
+            ProjectMember.user_id == user_id
+        ).first()
+
+        if not member:
+            return None
+
+        self.db.delete(member)
+        self.db.commit()
+
+        return member
+
+    def get_project_tasks_stats(self, project_id: int):
+        total = self.db.query(func.count(Task.id)).filter(
+            Task.project_id == project_id
+        ).scalar()
+
+        completed = self.db.query(func.count(Task.id)).filter(
+            Task.project_id == project_id,
+            Task.status == TaskStatus.DONE
+        ).scalar()
+
+        return total or 0, completed or 0

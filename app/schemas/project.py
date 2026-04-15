@@ -13,7 +13,7 @@ class ProjectResponse(BaseModel):
     name: Optional[str]
     description: Optional[str]
     manager_id: Optional[int]
-    status: Optional[str]
+    status: ProjectStatus
     deadline: Optional[datetime]
     created_at: Optional[datetime]
 
@@ -27,18 +27,6 @@ class ProjectCreateRequest(BaseModel):
     manager_id: int
 
 
-class ProjectResponse(BaseModel):
-    id: int
-    name: str
-    description: str | None
-    deadline: date
-    manager_id: int
-    status: ProjectStatus
-
-    class Config:
-        from_attributes = True
-
-
 class AddProjectMemberRequest(BaseModel):
     user_id: int
 
@@ -49,3 +37,17 @@ class UpdateProjectStatusRequest(BaseModel):
 
 class AssignManagerRequest(BaseModel):
     manager_id: int
+
+
+class ProjectMemberResponse(BaseModel):
+    user_id: int
+    role: str
+
+    class Config:
+        from_attributes = True
+
+
+class ProjectProgressResponse(BaseModel):
+    total_tasks: int
+    completed_tasks: int
+    progress: float
