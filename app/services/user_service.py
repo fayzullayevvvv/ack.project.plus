@@ -5,7 +5,7 @@ from fastapi.security import HTTPBasicCredentials
 from sqlalchemy.orm import Session
 
 from app.repository.user_repo import UserRepo
-from app.schemas.auth import UserLoginResponse
+from app.schemas.auth import UserLoginResponse, ChangePasswordRequest
 from app.schemas.user import CreateUser, UpdateUserData
 from app.core.security import (
     generate_token,
@@ -63,6 +63,21 @@ class UserService:
             data.password = hash_password(data.password)
 
         return self.repo.update_user(id, data)
+    
+    def reset_password(self, id: int, data: ChangePasswordRequest):
+        user = self.get_user_by_id(id)
+
+        if not verify_password(data.old_password, user.password_hash):
+            raise HTTPException(status_code=400, detail="Old password incorrect")
+
+        if verify_password(data.new_password, user.password_hash):
+            raise HTTPException(
+                status_code=400, detail="New password must be different"
+            )
+
+        new_hash = hash_password(data.new_password)
+
+        self.repo.update_password(user, new_hash)
 
     def activate_user(self, id: int):
         user = self.get_user_by_id(id)

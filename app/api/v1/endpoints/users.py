@@ -11,6 +11,7 @@ from app.schemas.user import (
     UserResponse,
     UpdateUserData,
 )
+from app.schemas.auth import ChangePasswordRequest
 from app.core.deps import get_admin, get_manager, get_db, get_admin_or_manager, get_user
 from app.services.user_service import UserService
 from app.repository.user_repo import UserRepo
@@ -91,7 +92,11 @@ def deactivate_user_view(
 @router.post("/{id}/reset-password")
 def reset_password_view(
     id: Annotated[int, Path()],
+    data: Annotated[ChangePasswordRequest, Body()],
     admin_or_manager: Annotated[User, Depends(get_admin_or_manager)],
     db: Annotated[Session, Depends(get_db)],
 ):
-    pass
+    service = UserService(db)
+    service.reset_password(id, data)
+
+    return {"message": "succesfully changed"}
