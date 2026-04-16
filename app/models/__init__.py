@@ -1,5 +1,5 @@
 from app.models.base import Base
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.attachment import ReportAttachment
 from app.models.auditlog import AuditLog
 from app.models.daily_report import DailyReport

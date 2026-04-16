@@ -38,12 +38,10 @@ class UserRepo:
         self.db.commit()
 
         return user
-    
+
     def update_profile(self, data: UpdateProfile, user: User):
         profile = (
-        self.db.query(UserProfile)
-        .filter(UserProfile.user_id == user.id)
-        .first()
+            self.db.query(UserProfile).filter(UserProfile.user_id == user.id).first()
         )
 
         if not profile:
@@ -59,7 +57,7 @@ class UserRepo:
         self.db.refresh(profile)
 
         return profile
-        
+
     def activate_user(self, user: User):
         user.is_active = True
 

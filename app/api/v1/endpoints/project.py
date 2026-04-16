@@ -5,13 +5,13 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_admin, get_db, get_user
 from app.schemas.project import (
-    ProjectCreateRequest, 
-    ProjectResponse, 
+    ProjectCreateRequest,
+    ProjectResponse,
     UpdateProjectStatusRequest,
     AssignManagerRequest,
     ProjectMemberResponse,
     AddProjectMemberRequest,
-    ProjectProgressResponse
+    ProjectProgressResponse,
 )
 from app.services.project_service import ProjectService
 from app.models.user import User
@@ -20,7 +20,7 @@ from app.models.user import User
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
 
-@router.post("/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
 def create_project(
     data: ProjectCreateRequest,
     db: Annotated[Session, Depends(get_db)],
@@ -40,7 +40,7 @@ def create_project(
     return project
 
 
-@router.get("/", response_model=List[ProjectResponse], status_code=status.HTTP_200_OK)
+@router.get("", response_model=List[ProjectResponse], status_code=status.HTTP_200_OK)
 def get_projects(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[Session, Depends(get_user)],
@@ -75,9 +75,7 @@ def update_project_status(
     service = ProjectService(db)
 
     project = service.update_project_status(
-        project_id=project_id,
-        new_status=data.status,
-        current_user=current_user
+        project_id=project_id, new_status=data.status, current_user=current_user
     )
 
     return project
@@ -93,9 +91,7 @@ def assign_manager(
     service = ProjectService(db)
 
     project = service.assign_manager(
-        project_id=project_id,
-        manager_id=data.manager_id,
-        current_user=current_user
+        project_id=project_id, manager_id=data.manager_id, current_user=current_user
     )
 
     return project
@@ -109,10 +105,7 @@ def accept_project(
 ):
     service = ProjectService(db)
 
-    project = service.accept_project(
-        project_id=project_id,
-        current_user=current_user
-    )
+    project = service.accept_project(project_id=project_id, current_user=current_user)
 
     return project
 
@@ -135,14 +128,12 @@ def add_member(
     project_id: Annotated[int, Path()],
     data: AddProjectMemberRequest,
     db: Annotated[Session, Depends(get_db)],
-    current_user:  Annotated[Session, Depends(get_user)],
+    current_user: Annotated[Session, Depends(get_user)],
 ):
     service = ProjectService(db)
 
     service.add_member(
-        project_id=project_id,
-        user_id=data.user_id,
-        current_user=current_user
+        project_id=project_id, user_id=data.user_id, current_user=current_user
     )
 
     return {"message": "Member added"}
@@ -158,9 +149,7 @@ def delete_member(
     service = ProjectService(db)
 
     service.delete_member(
-        project_id=project_id,
-        user_id=user_id,
-        current_user=current_user
+        project_id=project_id, user_id=user_id, current_user=current_user
     )
 
     return None

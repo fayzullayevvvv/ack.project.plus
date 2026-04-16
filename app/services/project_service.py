@@ -13,7 +13,7 @@ ALLOWED_TRANSITIONS = {
     "active": ["on_hold", "completed"],
     "on_hold": ["active"],
     "completed": ["archived"],
-    "archived": []
+    "archived": [],
 }
 
 
@@ -96,7 +96,7 @@ class ProjectService:
             return project
 
         raise HTTPException(403, "Access denied")
-    
+
     def get_project_members(self, project_id: int, current_user):
 
         project = self.repo.get_project_by_id(project_id)
@@ -149,7 +149,7 @@ class ProjectService:
             raise HTTPException(400, "Already member")
 
         return self.repo.add_member(project_id, user_id)
-    
+
     def update_project_status(self, project_id: int, new_status, current_user):
 
         project = self.repo.get_project_by_id(project_id)
@@ -170,12 +170,14 @@ class ProjectService:
         current_status = project.status
 
         if new_status not in ALLOWED_TRANSITIONS[current_status]:
-            raise HTTPException(400, f"Invalid transition: {current_status} -> {new_status}")
+            raise HTTPException(
+                400, f"Invalid transition: {current_status} -> {new_status}"
+            )
 
         project.status = new_status
 
         return self.repo.update_project(project)
-    
+
     def assign_manager(self, project_id: int, manager_id: int, current_user):
 
         project = self.repo.get_project_by_id(project_id)
@@ -197,7 +199,7 @@ class ProjectService:
         project.manager_id = manager_id
 
         return self.repo.update_project(project)
-    
+
     def accept_project(self, project_id: int, current_user):
 
         project = self.repo.get_project_by_id(project_id)
@@ -217,7 +219,7 @@ class ProjectService:
         project.status = ProjectStatus.ACTIVE
 
         return self.repo.update_project(project)
-    
+
     def delete_member(self, project_id: int, user_id: int, current_user):
 
         project = self.repo.get_project_by_id(project_id)
@@ -244,7 +246,7 @@ class ProjectService:
             raise HTTPException(404, "Member not found")
 
         return True
-    
+
     def get_project_progress(self, project_id: int, current_user):
 
         project = self.repo.get_project_by_id(project_id)
@@ -276,5 +278,5 @@ class ProjectService:
         return {
             "total_tasks": total,
             "completed_tasks": completed,
-            "progress": round(progress, 2)
+            "progress": round(progress, 2),
         }

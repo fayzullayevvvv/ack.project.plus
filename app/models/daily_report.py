@@ -26,7 +26,7 @@ class DailyReport(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
-    
+
     attachments: Mapped[List["ReportAttachment"]] = relationship(
         "ReportAttachment", back_populates="report", cascade="all, delete-orphan"
     )

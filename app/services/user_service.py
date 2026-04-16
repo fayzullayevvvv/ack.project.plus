@@ -25,6 +25,7 @@ from app.models.user import UserRole
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/heic"}
 MAX_SIZE = 2 * 1024 * 1024  # 2MB
 
+
 class UserService:
     def __init__(self, db: Session):
         self.db = db
@@ -75,15 +76,15 @@ class UserService:
             data.password = hash_password(data.password)
 
         return self.user_repo.update_user(id, data)
-    
+
     def update_avatar(self, user: User, file: UploadFile):
         if file.content_type not in ALLOWED_TYPES:
             raise HTTPException(400, "Invalid file type")
-        
+
         content = file.file.read()
         if len(content) > MAX_SIZE:
             raise HTTPException(400, "File too large")
-        
+
         file.file.seek(0)
 
         file_obj = self.file_repo.save_file(file, user)
@@ -91,7 +92,6 @@ class UserService:
         data = UpdateProfile(avatar_file_id=file_obj.id)
 
         return self.user_repo.update_profile(data=data, user=user)
-        
 
     def reset_password(self, id: int, data: ChangePasswordRequest):
         user = self.get_user_by_id(id)
@@ -194,7 +194,7 @@ class UserService:
             raise HTTPException(status_code=404, detail="user not found")
 
         return user
-    
+
     def get_user_projects(self, id: int):
         user = self.get_user_by_id(id)
 
@@ -206,12 +206,12 @@ class UserService:
 
         elif user.role == UserRole.WORKER:
             return self.project_repo.get_projects_by_user(user.id)
-        
+
     def get_user_tasks(self, id: int):
         user = self.get_user_by_id(id)
 
         return self.task_repo.get_tasks_by_user(user.id)
-    
+
     def get_user_reports(self, id: int):
         user = self.get_user_by_id(id)
 

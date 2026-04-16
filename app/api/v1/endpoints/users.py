@@ -106,8 +106,11 @@ def reset_password_view(
 
 
 @router.get("/{id}/projects", response_model=list[ProjectResponse])
-def get_user_projects(id: Annotated[int, Path()], admin_or_manager: Annotated[User, Depends(get_admin_or_manager)],
-    db: Annotated[Session, Depends(get_db)]):
+def get_user_projects(
+    id: Annotated[int, Path()],
+    admin_or_manager: Annotated[User, Depends(get_admin_or_manager)],
+    db: Annotated[Session, Depends(get_db)],
+):
     service = UserService(db)
     projects = service.get_user_projects(id)
 
@@ -115,8 +118,11 @@ def get_user_projects(id: Annotated[int, Path()], admin_or_manager: Annotated[Us
 
 
 @router.get("/{id}/tasks", response_model=list[TaskResponse])
-def get_user_projects(id: Annotated[int, Path()], admin_or_manager: Annotated[User, Depends(get_admin_or_manager)],
-    db: Annotated[Session, Depends(get_db)]):
+def get_user_projects(
+    id: Annotated[int, Path()],
+    admin_or_manager: Annotated[User, Depends(get_admin_or_manager)],
+    db: Annotated[Session, Depends(get_db)],
+):
     service = UserService(db)
     tasks = service.get_user_tasks(id)
 
@@ -124,8 +130,11 @@ def get_user_projects(id: Annotated[int, Path()], admin_or_manager: Annotated[Us
 
 
 @router.get("/{id}/reports", response_model=list[ReportResponse])
-def get_user_projects(id: Annotated[int, Path()], admin_or_manager: Annotated[User, Depends(get_admin_or_manager)],
-    db: Annotated[Session, Depends(get_db)]):
+def get_user_projects(
+    id: Annotated[int, Path()],
+    admin_or_manager: Annotated[User, Depends(get_admin_or_manager)],
+    db: Annotated[Session, Depends(get_db)],
+):
     service = UserService(db)
     tasks = service.get_user_reports(id)
 

@@ -32,10 +32,7 @@ class File(Base):
         ForeignKey("users.id"), index=True
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        index=True
+        DateTime(timezone=True), server_default=func.now(), index=True
     )
-
 
     uploader: Mapped[Optional["User"]] = relationship("User")

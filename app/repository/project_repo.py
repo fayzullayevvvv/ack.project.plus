@@ -48,40 +48,44 @@ class ProjectRepo:
         )
 
     def add_member(self, project_id: int, user_id: int):
-        member = ProjectMember(
-            project_id=project_id,
-            user_id=user_id,
-            role="worker"
-        )
+        member = ProjectMember(project_id=project_id, user_id=user_id, role="worker")
 
         self.db.add(member)
         self.db.commit()
         self.db.refresh(member)
 
         return member
-    
+
     def is_member(self, project_id: int, user_id: int):
-        return self.db.query(ProjectMember).filter(
-            ProjectMember.project_id == project_id,
-            ProjectMember.user_id == user_id
-        ).first()
-    
+        return (
+            self.db.query(ProjectMember)
+            .filter(
+                ProjectMember.project_id == project_id, ProjectMember.user_id == user_id
+            )
+            .first()
+        )
+
     def update_project(self, project):
         self.db.add(project)
         self.db.commit()
         self.db.refresh(project)
         return project
-    
+
     def get_project_members(self, project_id: int):
-        return self.db.query(ProjectMember).filter(
-            ProjectMember.project_id == project_id
-        ).all()
-    
+        return (
+            self.db.query(ProjectMember)
+            .filter(ProjectMember.project_id == project_id)
+            .all()
+        )
+
     def delete_member(self, project_id: int, user_id: int):
-        member = self.db.query(ProjectMember).filter(
-            ProjectMember.project_id == project_id,
-            ProjectMember.user_id == user_id
-        ).first()
+        member = (
+            self.db.query(ProjectMember)
+            .filter(
+                ProjectMember.project_id == project_id, ProjectMember.user_id == user_id
+            )
+            .first()
+        )
 
         if not member:
             return None
@@ -92,13 +96,16 @@ class ProjectRepo:
         return member
 
     def get_project_tasks_stats(self, project_id: int):
-        total = self.db.query(func.count(Task.id)).filter(
-            Task.project_id == project_id
-        ).scalar()
+        total = (
+            self.db.query(func.count(Task.id))
+            .filter(Task.project_id == project_id)
+            .scalar()
+        )
 
-        completed = self.db.query(func.count(Task.id)).filter(
-            Task.project_id == project_id,
-            Task.status == TaskStatus.DONE
-        ).scalar()
+        completed = (
+            self.db.query(func.count(Task.id))
+            .filter(Task.project_id == project_id, Task.status == TaskStatus.DONE)
+            .scalar()
+        )
 
         return total or 0, completed or 0

@@ -17,6 +17,37 @@ class TaskStatus(str, enum.Enum):
     DONE = "done"
     CANCELED = "canceled"
 
+    def can_transition(self, to: "TaskStatus") -> bool:
+        return to in self._transitions().get(self, set())
+
+    @classmethod
+    def _transitions(cls) -> dict["TaskStatus", set["TaskStatus"]]:
+        return {
+            cls.TODO: {cls.IN_PROGRESS, cls.CANCELED},
+            cls.IN_PROGRESS: {cls.REVIEW, cls.BLOCKED, cls.CANCELED},
+            cls.REVIEW: {cls.DONE, cls.IN_PROGRESS},
+            cls.BLOCKED: {cls.IN_PROGRESS, cls.CANCELED},
+        }
+
+    @classmethod
+    def active_statuses(cls) -> set["TaskStatus"]:
+        return {
+            cls.TODO,
+            cls.IN_PROGRESS,
+            cls.REVIEW,
+            cls.BLOCKED,
+        }
+
+    @classmethod
+    def final_statuses(cls) -> set["TaskStatus"]:
+        return {
+            cls.DONE,
+            cls.CANCELED,
+        }
+
+    def is_final(self) -> bool:
+        return self in self.final_statuses()
+
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -27,7 +58,9 @@ class Task(Base):
     )
     title: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
-    status: Mapped[TaskStatus] = mapped_column(Enum(TaskStatus))
+    status: Mapped[TaskStatus] = mapped_column(
+        Enum(TaskStatus), default=TaskStatus.TODO
+    )
     deadline: Mapped[Optional[datetime]] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

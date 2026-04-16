@@ -25,7 +25,9 @@ class ProjectMember(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), nullable=False, index=True
     )
-    role: Mapped[ProjectRole] = mapped_column(Enum(ProjectRole), nullable=False, default=ProjectRole.WORKER)
+    role: Mapped[ProjectRole] = mapped_column(
+        Enum(ProjectRole), nullable=False, default=ProjectRole.WORKER
+    )
 
     project: Mapped["Project"] = relationship("Project", back_populates="members")
     user: Mapped["User"] = relationship("User")

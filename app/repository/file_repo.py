@@ -41,7 +41,7 @@ class FileRepo:
         self.db.refresh(db_file)
 
         return db_file
-    
+
     def _detect_type(self, content_type: str):
         if content_type.startswith("image/"):
             return FileType.IMAGE

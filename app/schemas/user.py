@@ -13,8 +13,7 @@ from pydantic import (
 from app.models.user import UserRole
 from app.schemas.user_profile import UserProfile
 from app.schemas.project import ProjectResponse
-from app.schemas.task import TaskResponse
-from app.schemas.task_assignments import TaskAssignmentResponse
+from app.schemas.task import TaskResponse, TaskAssignmentResponse
 
 
 USERNAME_REGEX = re.compile(r"^[a-zA-Z0-9_]+$")
