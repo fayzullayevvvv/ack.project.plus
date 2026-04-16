@@ -42,3 +42,6 @@ class ReportRepo:
             .order_by(DailyReport.report_date.desc())
             .all()
         )
+    
+    def get_by_id(self, id: int):
+        return self.db.query(DailyReport).filter(DailyReport.id == id).first()

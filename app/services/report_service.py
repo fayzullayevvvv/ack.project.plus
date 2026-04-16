@@ -63,3 +63,38 @@ class ReportService:
             detail="Access denied",
         )
     
+    def get_report(self, report_id: int, user):
+        report = self.repo.get_by_id(report_id)
+
+        if not report:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Report not found",
+            )
+
+        if user.role == UserRole.ADMIN:
+            return report
+
+        if user.role == UserRole.MANAGER:
+            if not self.project_repo.is_project_member(
+                report.project_id, user.id
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Access denied",
+                )
+            return report
+
+        if user.role == UserRole.WORKER:
+            if report.user_id != user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Access denied",
+                )
+            return report
+
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+        detail="Access denied",
+    )
+    
