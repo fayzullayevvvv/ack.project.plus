@@ -31,3 +31,14 @@ class ReportRepo:
             .first()
             is not None
         )
+    
+    def get_all(self):
+        return self.db.query(DailyReport).all()
+    
+    def get_by_projects(self, project_ids: list[int]):
+        return (
+            self.db.query(DailyReport)
+            .filter(DailyReport.project_id.in_(project_ids))
+            .order_by(DailyReport.report_date.desc())
+            .all()
+        )

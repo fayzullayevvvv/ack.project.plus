@@ -109,14 +109,11 @@ class ProjectRepo:
         )
 
         return total or 0, completed or 0
-
-    def is_user_in_project(self, project_id: int, user_id: int) -> bool:
-        return (
-            self.db.query(ProjectMember.id)
-            .filter(
-                ProjectMember.project_id == project_id,
-                ProjectMember.user_id == user_id,
-            )
-            .first()
-            is not None
-        )
+    
+    def get_user_project_ids(self, user_id: int) -> list[int]:
+        return [
+            m.project_id
+            for m in self.db.query(ProjectMember.project_id)
+            .filter(ProjectMember.user_id == user_id)
+            .all()
+        ]
