@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from fastapi import HTTPException, status
 
 from app.repository.report_repo import ReportRepo
@@ -42,7 +42,36 @@ class ReportService:
             task_id=data.task_id,
             text=data.text,
         )
-    
+
+    def update_report(self, report_id: int, data, user):
+        report = self.repo.get_by_id(report_id)
+
+        if not report:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Report not found",
+            )
+
+        if report.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only report owner can update",
+            )
+
+        now = datetime.utcnow()
+        if report.created_at < now - timedelta(hours=24):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Report can only be edited within 24 hours",
+            )
+
+        update_data = {}
+
+        if data.text is not None:
+            update_data["text"] = data.text
+
+        return self.repo.update(report, update_data)
+
     def get_reports(self, user):
         if user.role == UserRole.ADMIN:
             return self.repo.get_all()
@@ -62,7 +91,7 @@ class ReportService:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied",
         )
-    
+
     def get_report(self, report_id: int, user):
         report = self.repo.get_by_id(report_id)
 
@@ -76,9 +105,7 @@ class ReportService:
             return report
 
         if user.role == UserRole.MANAGER:
-            if not self.project_repo.is_project_member(
-                report.project_id, user.id
-            ):
+            if not self.project_repo.is_project_member(report.project_id, user.id):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Access denied",
@@ -95,6 +122,5 @@ class ReportService:
 
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-        detail="Access denied",
-    )
-    
+            detail="Access denied",
+        )

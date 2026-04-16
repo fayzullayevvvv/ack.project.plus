@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import date, datetime
 
 from pydantic import BaseModel, Field
@@ -30,8 +31,12 @@ class ReportDetailResponse(BaseModel):
     user: UserResponse
     task: TaskResponse
     project: ProjectResponse
-    text: str
+    text: str | None = None
     report_date: date
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class UpdateReportRequest(BaseModel):
+    text: Optional[str] = Field(default=None, max_length=5000)

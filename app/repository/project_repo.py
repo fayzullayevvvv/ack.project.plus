@@ -109,7 +109,7 @@ class ProjectRepo:
         )
 
         return total or 0, completed or 0
-    
+
     def get_user_project_ids(self, user_id: int) -> list[int]:
         return [
             m.project_id

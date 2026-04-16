@@ -31,10 +31,10 @@ class ReportRepo:
             .first()
             is not None
         )
-    
+
     def get_all(self):
         return self.db.query(DailyReport).all()
-    
+
     def get_by_projects(self, project_ids: list[int]):
         return (
             self.db.query(DailyReport)
@@ -42,6 +42,15 @@ class ReportRepo:
             .order_by(DailyReport.report_date.desc())
             .all()
         )
-    
+
     def get_by_id(self, id: int):
         return self.db.query(DailyReport).filter(DailyReport.id == id).first()
+
+    def update(self, report, data: dict):
+        for key, value in data.items():
+            setattr(report, key, value)
+
+        self.db.commit()
+        self.db.refresh(report)
+
+        return report
