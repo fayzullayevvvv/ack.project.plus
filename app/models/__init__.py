@@ -13,3 +13,4 @@ from app.models.task_status_history import TaskStatusHistory
 from app.models.task import Task
 from app.models.user_profile import UserProfile
 from app.models.refresh_token import RefreshToken
+from app.models.monthly_report_submission import MonthlyReportSubmission, MonthlyReportStatus

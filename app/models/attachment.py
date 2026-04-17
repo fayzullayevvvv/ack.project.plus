@@ -18,5 +18,4 @@ class ReportAttachment(Base):
     report: Mapped["DailyReport"] = relationship(
         "DailyReport", back_populates="attachments"
     )
-
     file: Mapped["File"] = relationship("File")
