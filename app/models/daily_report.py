@@ -58,6 +58,7 @@ class DailyReport(Base):
         "ReportAttachment",
         back_populates="report",
         cascade="all, delete-orphan",
+        lazy="selectin"
     )
     user: Mapped["User"] = relationship("User")
     task: Mapped[Optional["Task"]] = relationship("Task")

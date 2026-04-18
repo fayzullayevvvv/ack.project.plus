@@ -1,11 +1,12 @@
 from typing import Optional
 from datetime import date, datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from app.schemas.user import UserResponse
 from app.schemas.task import TaskResponse
 from app.schemas.project import ProjectResponse
+from app.models import MonthlyReportStatus
 
 
 class CreateDailyReport(BaseModel):
@@ -40,3 +41,33 @@ class ReportDetailResponse(BaseModel):
 
 class UpdateReportRequest(BaseModel):
     text: Optional[str] = Field(default=None, max_length=5000)
+
+
+class MonthlyReportItem(BaseModel):
+    report_id: int
+    report_date: date
+    text: Optional[str]
+
+
+class MonthlyReportResponse(BaseModel):
+    user_id: int
+    project_id: int
+    year: int
+    month: int
+    total_reports: int
+    reports: list[MonthlyReportItem]
+
+
+class MonthlyReportSubmitResponse(BaseModel):
+    id: int
+    user_id: int
+    project_id: int
+    year: int
+    month: int
+    total_reports: int
+    submitted_at: datetime
+    status: MonthlyReportStatus
+
+    reports: list[ReportResponse] = []
+
+    model_config = ConfigDict(from_attributes=True)
