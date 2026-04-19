@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, status, Path
+from fastapi import APIRouter, Depends, status, Path, Body
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_admin, get_db, get_user
@@ -12,6 +12,8 @@ from app.schemas.project import (
     ProjectMemberResponse,
     AddProjectMemberRequest,
     ProjectProgressResponse,
+    UpdateProjectRequest,
+    ProjectDetailResponse
 )
 from app.services.project_service import ProjectService
 from app.models.user import User
@@ -51,7 +53,7 @@ def get_projects(
     return projects
 
 
-@router.get("/{project_id}", response_model=ProjectResponse)
+@router.get("/{project_id}", response_model=ProjectDetailResponse)
 def get_project(
     project_id: Annotated[int, Path()],
     db: Annotated[Session, Depends(get_db)],
@@ -64,10 +66,28 @@ def get_project(
     return project
 
 
+@router.patch("/{project_id}", response_model=ProjectResponse)
+def update_project(
+    project_id: Annotated[int, Path()],
+    data: UpdateProjectRequest,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_user)],
+):
+    service = ProjectService(db)
+
+    project = service.update_project(
+        project_id=project_id,
+        data=data,
+        current_user=current_user,
+    )
+
+    return project
+
+
 @router.patch("/{project_id}/status")
 def update_project_status(
     project_id: Annotated[int, Path()],
-    data: UpdateProjectStatusRequest,
+    data: Annotated[UpdateProjectStatusRequest, Body()],
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[Session, Depends(get_user)],
 ):

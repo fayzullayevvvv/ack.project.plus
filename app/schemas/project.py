@@ -3,9 +3,41 @@ from datetime import date
 from typing import Optional
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
 from app.models.project import ProjectStatus
+from app.models.user import UserRole
+from app.models.task import TaskStatus
+
+
+class ProjectMemberResponse(BaseModel):
+    user_id: int
+    role: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TaskResponse(BaseModel):
+    id: int
+    project_id: int
+    title: str
+    description: Optional[str] = None
+    status: TaskStatus
+    deadline: datetime
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserResponse(BaseModel):
+    id: int = Field(gt=0)
+    username: str
+    email: EmailStr | None
+    role: UserRole
+    is_active: bool
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectResponse(BaseModel):
@@ -16,6 +48,20 @@ class ProjectResponse(BaseModel):
     status: ProjectStatus
     deadline: Optional[datetime]
     created_at: Optional[datetime]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ProjectDetailResponse(BaseModel):
+    id: Optional[int]
+    name: Optional[str]
+    description: Optional[str]
+    manager: UserResponse
+    status: ProjectStatus
+    deadline: Optional[datetime]
+    created_at: Optional[datetime]
+    tasks: list[TaskResponse] = []
+    members: list[ProjectMemberResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
 
