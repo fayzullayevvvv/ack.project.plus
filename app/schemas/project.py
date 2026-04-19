@@ -51,3 +51,9 @@ class ProjectProgressResponse(BaseModel):
     total_tasks: int
     completed_tasks: int
     progress: float
+
+
+class UpdateProjectRequest(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    deadline: date | None = None

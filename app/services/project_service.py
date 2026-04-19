@@ -323,3 +323,39 @@ class ProjectService:
             "completed_tasks": completed,
             "progress": round(progress, 2),
         }
+
+    def update_project(self, project_id: int, data, current_user):
+        project = self.repo.get_project_by_id(project_id)
+
+        if not project:
+            raise HTTPException(404, "Project not found")
+
+        if current_user.role == UserRole.ADMIN:
+            pass
+
+        elif current_user.role == UserRole.MANAGER:
+            if project.manager_id != current_user.id:
+                raise HTTPException(403, "Access denied")
+
+        else:
+            raise HTTPException(403, "Only admin or manager")
+
+        if data.name is not None:
+            project.name = data.name
+
+        if data.description is not None:
+            project.description = data.description
+
+        if data.deadline is not None:
+            project.deadline = data.deadline
+
+        project = self.repo.update_project(project)
+
+        self.log_repo.create_log(
+            current_user.id,
+            AuditAction.UPDATE,
+            "project",
+            project.id,
+        )
+
+        return project

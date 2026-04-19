@@ -12,6 +12,7 @@ from app.schemas.project import (
     ProjectMemberResponse,
     AddProjectMemberRequest,
     ProjectProgressResponse,
+    UpdateProjectRequest
 )
 from app.services.project_service import ProjectService
 from app.models.user import User
@@ -20,7 +21,7 @@ from app.models.user import User
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
 
-@router.post("", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
 def create_project(
     data: ProjectCreateRequest,
     db: Annotated[Session, Depends(get_db)],
@@ -33,14 +34,13 @@ def create_project(
         description=data.description,
         deadline=data.deadline,
         manager_id=data.manager_id,
-        created_by=current_user.id,
         current_user_role=current_user.role,
     )
 
     return project
 
 
-@router.get("", response_model=List[ProjectResponse], status_code=status.HTTP_200_OK)
+@router.get("/", response_model=List[ProjectResponse], status_code=status.HTTP_200_OK)
 def get_projects(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[Session, Depends(get_user)],
@@ -61,6 +61,24 @@ def get_project(
     service = ProjectService(db)
 
     project = service.get_project_detail(project_id, current_user)
+
+    return project
+
+
+@router.patch("/{project_id}", response_model=ProjectResponse)
+def update_project(
+    project_id: Annotated[int, Path()],
+    data: UpdateProjectRequest,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_user)],
+):
+    service = ProjectService(db)
+
+    project = service.update_project(
+        project_id=project_id,
+        data=data,
+        current_user=current_user,
+    )
 
     return project
 
