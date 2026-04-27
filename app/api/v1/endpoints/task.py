@@ -134,7 +134,7 @@ def get_assignments(
     )
 
 
-@router.get("tasks/{id}/history", response_model=list[TaskStatusHistoryResponse])
+@router.get("/tasks/{id}/history", response_model=list[TaskStatusHistoryResponse])
 def get_task_history(
     id: Annotated[int, Path()],
     db: Annotated[Session, Depends(get_db)],
@@ -144,7 +144,7 @@ def get_task_history(
     return service.get_task_history(task_id=id, user=user)
 
 
-@router.get("my/tasks", response_model=list[TaskResponse])
+@router.get("/my/tasks", response_model=list[TaskResponse])
 def get_my_tasks(
     db: Annotated[Session, Depends(get_db)],
     worker: Annotated[User, Depends(get_worker)],
@@ -153,7 +153,7 @@ def get_my_tasks(
     return service.get_tasks(user=worker)
 
 
-@router.get("manager/tasks", response_model=list[TaskResponse])
+@router.get("/manager/tasks", response_model=list[TaskResponse])
 def get_my_tasks(
     db: Annotated[Session, Depends(get_db)],
     manager: Annotated[User, Depends(get_manager)],

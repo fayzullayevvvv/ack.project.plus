@@ -41,7 +41,7 @@ class TaskAssignmentResponse(BaseModel):
     task_id: int
     user_id: int
     assigned_by: Optional[int] = None
-    role_on_task: Optional[str] = None
+    role_on_task: Optional[str] = Field(default=None, max_length=50)
     assigned_at: datetime
 
     task: Optional[TaskResponse] = None
