@@ -36,13 +36,13 @@ class ProjectRepo:
 
     def get_projects_by_manager(self, manager_id: int):
         return (
-        self.db.query(Project)
-        .filter(
-            Project.manager_id == manager_id,
-            Project.status != ProjectStatus.ARCHIVED
+            self.db.query(Project)
+            .filter(
+                Project.manager_id == manager_id,
+                Project.status != ProjectStatus.ARCHIVED,
+            )
+            .all()
         )
-        .all()
-    )
 
     def get_projects_by_user(self, user_id: int):
         return (
@@ -50,7 +50,7 @@ class ProjectRepo:
             .join(ProjectMember)
             .filter(
                 ProjectMember.user_id == user_id,
-                Project.status != ProjectStatus.ARCHIVED
+                Project.status != ProjectStatus.ARCHIVED,
             )
             .all()
         )
@@ -58,10 +58,7 @@ class ProjectRepo:
     def get_project_by_id(self, project_id: int):
         return (
             self.db.query(Project)
-            .filter(
-                Project.id == project_id,
-                Project.status != ProjectStatus.ARCHIVED
-            )
+            .filter(Project.id == project_id, Project.status != ProjectStatus.ARCHIVED)
             .first()
         )
 

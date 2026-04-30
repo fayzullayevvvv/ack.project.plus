@@ -20,7 +20,6 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 limiter = Limiter(key_func=get_remote_address)
 
 
-
 @router.post("/login", response_model=UserLoginResponse, status_code=status.HTTP_200_OK)
 @limiter.limit("5/minute")
 def login_view(

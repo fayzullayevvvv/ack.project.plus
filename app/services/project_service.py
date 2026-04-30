@@ -77,7 +77,7 @@ class ProjectService:
             return self.repo.get_projects_by_user(user.id)
 
         return []
-    
+
     def get_archived_projects(self, current_user: User):
         if current_user.role != UserRole.ADMIN:
             raise HTTPException(403, "Only admin can view archived projects")
