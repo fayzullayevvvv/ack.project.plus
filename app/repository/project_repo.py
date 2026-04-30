@@ -1,7 +1,7 @@
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.models.project import Project
+from app.models.project import Project, ProjectStatus
 from app.models.user import User
 from app.models.project_members import ProjectMember
 from app.models.task import Task, TaskStatus
@@ -21,21 +21,49 @@ class ProjectRepo:
         return project
 
     def get_all_projects(self):
-        return self.db.query(Project).all()
+        return (
+            self.db.query(Project)
+            .filter(Project.status != ProjectStatus.ARCHIVED)
+            .all()
+        )
+
+    def get_all_archived_projects(self):
+        return (
+            self.db.query(Project)
+            .filter(Project.status == ProjectStatus.ARCHIVED)
+            .all()
+        )
 
     def get_projects_by_manager(self, manager_id: int):
-        return self.db.query(Project).filter(Project.manager_id == manager_id).all()
+        return (
+        self.db.query(Project)
+        .filter(
+            Project.manager_id == manager_id,
+            Project.status != ProjectStatus.ARCHIVED
+        )
+        .all()
+    )
 
     def get_projects_by_user(self, user_id: int):
         return (
             self.db.query(Project)
             .join(ProjectMember)
-            .filter(ProjectMember.user_id == user_id)
+            .filter(
+                ProjectMember.user_id == user_id,
+                Project.status != ProjectStatus.ARCHIVED
+            )
             .all()
         )
 
     def get_project_by_id(self, project_id: int):
-        return self.db.query(Project).filter(Project.id == project_id).first()
+        return (
+            self.db.query(Project)
+            .filter(
+                Project.id == project_id,
+                Project.status != ProjectStatus.ARCHIVED
+            )
+            .first()
+        )
 
     def is_project_member(self, project_id: int, user_id: int) -> bool:
         return (

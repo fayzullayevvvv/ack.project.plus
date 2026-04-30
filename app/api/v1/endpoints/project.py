@@ -44,7 +44,7 @@ def create_project(
 @router.get("/", response_model=List[ProjectResponse], status_code=status.HTTP_200_OK)
 def get_projects(
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[Session, Depends(get_user)],
+    current_user: Annotated[User, Depends(get_user)],
 ):
     service = ProjectService(db)
 
@@ -53,11 +53,21 @@ def get_projects(
     return projects
 
 
+@router.get("/archived", response_model=List[ProjectResponse])
+def get_archived_projects(
+
+    current_user: Annotated[User, Depends(get_user)],
+    db: Annotated[Session, Depends(get_db)],
+):
+    service = ProjectService(db)
+    return service.get_archived_projects(current_user)
+
+
 @router.get("/{project_id}", response_model=ProjectDetailResponse)
 def get_project(
     project_id: Annotated[int, Path()],
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[Session, Depends(get_user)],
+    current_user: Annotated[User, Depends(get_user)],
 ):
     service = ProjectService(db)
 
@@ -89,7 +99,7 @@ def update_project_status(
     project_id: Annotated[int, Path()],
     data: Annotated[UpdateProjectStatusRequest, Body()],
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[Session, Depends(get_user)],
+    current_user: Annotated[User, Depends(get_user)],
 ):
     service = ProjectService(db)
 
@@ -147,7 +157,7 @@ def add_member(
     project_id: Annotated[int, Path()],
     data: AddProjectMemberRequest,
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[Session, Depends(get_user)],
+    current_user: Annotated[User, Depends(get_user)],
 ):
     service = ProjectService(db)
 
@@ -163,7 +173,7 @@ def delete_member(
     project_id: Annotated[int, Path()],
     user_id: Annotated[int, Path()],
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[Session, Depends(get_user)],
+    current_user: Annotated[User, Depends(get_user)],
 ):
     service = ProjectService(db)
 
@@ -178,7 +188,7 @@ def delete_member(
 def get_progress(
     project_id: Annotated[int, Path()],
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[Session, Depends(get_user)],
+    current_user: Annotated[User, Depends(get_user)],
 ):
     service = ProjectService(db)
 
