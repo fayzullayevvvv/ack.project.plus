@@ -11,10 +11,23 @@ from app.models.auditlog import AuditAction
 
 ALLOWED_TRANSITIONS = {
     ProjectStatus.DRAFT: [ProjectStatus.ASSIGNED],
-    ProjectStatus.ASSIGNED: [ProjectStatus.ACTIVE, ProjectStatus.ON_HOLD],
-    ProjectStatus.ACTIVE: [ProjectStatus.ON_HOLD, ProjectStatus.COMPLETED],
-    ProjectStatus.ON_HOLD: [ProjectStatus.ACTIVE],
-    ProjectStatus.COMPLETED: [ProjectStatus.ARCHIVED],
+    ProjectStatus.ASSIGNED: [
+        ProjectStatus.ACTIVE,
+        ProjectStatus.ON_HOLD,
+        ProjectStatus.ARCHIVED,
+    ],
+    ProjectStatus.ACTIVE: [
+        ProjectStatus.ON_HOLD,
+        ProjectStatus.COMPLETED,
+        ProjectStatus.ARCHIVED,
+    ],
+    ProjectStatus.ON_HOLD: [
+        ProjectStatus.ACTIVE,
+        ProjectStatus.ARCHIVED,
+    ],
+    ProjectStatus.COMPLETED: [
+        ProjectStatus.ARCHIVED,
+    ],
     ProjectStatus.ARCHIVED: [],
 }
 
@@ -77,12 +90,6 @@ class ProjectService:
             return self.repo.get_projects_by_user(user.id)
 
         return []
-
-    def get_archived_projects(self, current_user: User):
-        if current_user.role != UserRole.ADMIN:
-            raise HTTPException(403, "Only admin can view archived projects")
-
-        return self.repo.get_all_archived_projects()
 
     def get_project_detail(self, project_id: int, user):
 

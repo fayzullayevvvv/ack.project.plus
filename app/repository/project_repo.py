@@ -27,13 +27,6 @@ class ProjectRepo:
             .all()
         )
 
-    def get_all_archived_projects(self):
-        return (
-            self.db.query(Project)
-            .filter(Project.status == ProjectStatus.ARCHIVED)
-            .all()
-        )
-
     def get_projects_by_manager(self, manager_id: int):
         return (
             self.db.query(Project)

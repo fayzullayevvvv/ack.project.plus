@@ -53,15 +53,6 @@ def get_projects(
     return projects
 
 
-@router.get("/archived", response_model=List[ProjectResponse])
-def get_archived_projects(
-    current_user: Annotated[User, Depends(get_user)],
-    db: Annotated[Session, Depends(get_db)],
-):
-    service = ProjectService(db)
-    return service.get_archived_projects(current_user)
-
-
 @router.get("/{project_id}", response_model=ProjectDetailResponse)
 def get_project(
     project_id: Annotated[int, Path()],
