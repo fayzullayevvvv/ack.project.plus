@@ -17,12 +17,12 @@ router = APIRouter(prefix="/files", tags=["Files"])
 @router.post("/upload", response_model=UploadResponse)
 def upload_file(
     report_id: int = Form(...),
-    files: UploadFile = File(...),
+    file: UploadFile = File(...),
     db: Session = Depends(get_db),
     user: User = Depends(get_user),
 ):
     service = FileService(db)
-    return service.upload_files(files, user, report_id)
+    return service.upload_files(file, user, report_id)
 
 
 @router.get("/{id}")
@@ -38,7 +38,7 @@ def get_file(
         path=file.path,
         filename=file.original_name,
         media_type=file.content_type,
-        content_disposition_type="inline",
+        content_disposition_type="inline"
     )
 
 
@@ -65,7 +65,9 @@ def download_file_view(
         path=file.path,
         filename=file.original_name,
         media_type=file.content_type,
-        headers={"Content-Disposition": f'attachment; filename="{file.original_name}"'},
+        headers={
+            "Content-Disposition": f'attachment; filename="{file.original_name}"'
+        },
     )
 
 
