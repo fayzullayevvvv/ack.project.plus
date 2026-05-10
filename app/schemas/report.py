@@ -10,16 +10,16 @@ from app.models import MonthlyReportStatus
 
 
 class CreateDailyReport(BaseModel):
-    project_id: int
-    task_id: int
+    project_id: int = Field(..., gt=0)
+    task_id: int = Field(..., gt=0)
     text: str = Field(default=None, max_length=5000)
 
 
 class ReportResponse(BaseModel):
-    id: int
-    user_id: int
-    task_id: int
-    project_id: int
+    id: int = Field(..., gt=0)
+    user_id: int = Field(..., gt=0)
+    task_id: int = Field(..., gt=0)
+    project_id: int = Field(..., gt=0)
     text: str
     report_date: date
     created_at: datetime
