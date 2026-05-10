@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from typing import Optional
 
 from pydantic import (
     BaseModel,
@@ -95,10 +96,6 @@ class UserResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
-
-
-from pydantic import BaseModel, Field, EmailStr, model_validator, ConfigDict
-from typing import Optional
 
 
 class UpdateUserData(BaseModel):

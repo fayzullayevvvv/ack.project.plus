@@ -39,7 +39,7 @@ def create_task_view(
     manager: Annotated[User, Depends(get_manager)],
 ):
     service = TaskService(db)
-    task = service.create_task(data, project_id, get_user)
+    task = service.create_task(data, project_id, manager)
 
     return task
 

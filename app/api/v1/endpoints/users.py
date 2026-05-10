@@ -25,7 +25,7 @@ router = APIRouter(prefix="/users", tags=["User"])
 @router.post("/", response_model=UserResponse, status_code=201)
 def create_user_view(
     data: Annotated[CreateUser, Body()],
-    manager: Annotated[User, Depends(get_manager)],
+    manager_admin: Annotated[User, Depends(get_admin_or_manager)],
     db: Annotated[Session, Depends(get_db)],
 ):
     service = UserService(db)

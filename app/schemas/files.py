@@ -12,7 +12,7 @@ class UploadResponse(BaseModel):
     size: int
 
 
-class FileResponse(BaseModel):
+class FileResponseSchema(BaseModel):
     path: str
     filename: str
     media_type: str
